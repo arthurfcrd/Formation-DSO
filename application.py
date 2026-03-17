@@ -76,7 +76,15 @@ def uploaded():
             return render_template('error.html', err=err)
             #raise ValueError(f"{Fore.RED}[-] Invalid filename : {file.filename}{Fore.RESET}")
         else:
-            file_content = process_file(file_name)
+            # Définir un répertoire de base sécurisé pour les fichiers
+            base_path = os.path.abspath(os.path.join(Path(__file__).parent, 'files'))
+            requested_path = os.path.abspath(os.path.join(base_path, file_name))
+            # Vérifier que le chemin final reste dans le répertoire de base
+            if not requested_path.startswith(base_path + os.sep):
+                err = "Invalid file path"
+                return render_template('error.html', err=err)
+
+            file_content = process_file(requested_path)
             
             string_file_content = str(file_content)
             if string_file_content.__contains__('Errno'):
@@ -84,16 +92,14 @@ def uploaded():
                 return render_template('error.html', err=err)
             else:
                 print(f"{Fore.GREEN}[+] file uploded ! {file_name}{Fore.RESET}")
-                path = f'{Path(__file__).parent}'
-                path_full_write = f"{path}\\files\\{file_name}"
-                content = readfile(file_name)
-                writefile(path_full_write, content)
+                content = readfile(requested_path)
+                writefile(requested_path, content)
 
 
     return render_template('upload.html', file_content=file_content)
 
-def  readfile(file_name):
-    with open (file_name, "r") as fichier:
+def  readfile(file_path):
+    with open(file_path, "r") as fichier:
         content = fichier.read()
     return content
 
@@ -104,11 +110,11 @@ def writefile(full_path, content):
 
 
 #Utilisation de la fonction vulnérable selon le POC de la CVE-2020-1747
-def process_file(file_name):
+def process_file(file_path):
     #Chargement du fichier YAML
-    if ".yaml" in file_name or ".yml" in file_name:
+    if ".yaml" in file_path or ".yml" in file_path:
         try:
-            with open(file_name,'rb') as f:
+            with open(file_path,'rb') as f:
                 content = f.read()
                 data = yaml.load(content, Loader=yaml.FullLoader) # Using vulnerable FullLoader
         except Exception as er:
