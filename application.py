@@ -33,7 +33,7 @@ def error():
 @app.route('/files')
 def files():
     path = f'{Path(__file__).parent}'
-    file_path = path + "\\files"
+    file_path = os.path.join(path, 'files')
     print(file_path)
     fichier = []
     for item in os.listdir(file_path):
@@ -161,8 +161,7 @@ def gen_reqtxt(directory):
 
 if __name__ == '__main__':
     #Récupère le path de l'application
-    app.run(host="0.0.0.0", port=5000)
-    directory = f'{Path(__file__).parent}'
-    print(directory)
-    gen_reqtxt(directory)
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
+    # directory = f'{Path(__file__).parent}'
+    # print(directory)
+    # gen_reqtxt(directory)

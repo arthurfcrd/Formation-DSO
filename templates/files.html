@@ -31,7 +31,7 @@
     <ul>
         {% for file in files%}
         <li>
-            <a href="http://localhost:5000/view?file={{ file }}" >{{ file }}</a>
+            <a href="{{ url_for('view_file', file=file) }}">{{ file }}</a>
             <!-- {{ file }} -->
         </li>
         {% endfor %}
